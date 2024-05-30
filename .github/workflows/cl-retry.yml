@@ -1,0 +1,33 @@
+name: CI-Retry
+
+on:
+  workflow_dispatch
+
+jobs:
+  retry:
+    runs-on: ubuntu-latest  # Can be any runner
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Check Previous Workflow Run Status
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.actions.getWorkflowRunStatus({ owner: 'iabdrahim', repo: 'rdp-win', workflow_id: 'CI' })
+            .then(data => {
+              if (data.conclusion === 'failure') {
+                core.setOutput('should_retry', 'true');
+              } else {
+                core.setOutput('should_retry', 'false');
+              }
+            });
+
+      - uses: shivammathur/retry@v2
+        if: ${{ needs.retry.outputs.should_retry == 'true' }}
+        with:
+          attempts: 3  # Adjust as needed
+          delay: 60  # Delay in seconds between retries (optional)
+          on: failure  # Retry on workflow failure only
+
+          # Replace with the actual workflow you want to retry
+          retry_workflow: 'CI'
