@@ -6,7 +6,7 @@ from time import sleep
 import sys
 
 # Constants
-GITHUB_REPO = "iabdrahim/rdp-win"
+GITHUB_REPO = "iabdrahim/WindowsRdp"
 GITHUB_API_BASE_URL = f"https://api.github.com/repos/{GITHUB_REPO}"
 GITHUB_WORKFLOW_ID = "100349647"
 NGROK_API_URL = "https://api.ngrok.com/endpoints"
