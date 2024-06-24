@@ -1,9 +1,6 @@
 os: windows
 language: shell
 
-env:
-  global:
-    - secure: "encrypted NGROK_AUTH_TOKEN here"
 
 before_install:
   - choco install ngrok -y
