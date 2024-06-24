@@ -1,0 +1,22 @@
+os: windows
+language: shell
+
+before_install:
+  - choco install ngrok
+  - ngrok authtoken $NGROK_AUTH_TOKEN
+
+script:
+  - powershell -Command "Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Value 0"
+  - powershell -Command "Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'"
+  - start ngrok tcp 3389
+  - powershell -Command "Start-Sleep -Seconds 5"
+  - powershell -Command "$ngrok_url = (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing).Content | ConvertFrom-Json | Select-Object -ExpandProperty tunnels | Where-Object {$_.proto -eq 'tcp'} | Select-Object -ExpandProperty public_url"
+  - powershell -Command "Write-Host 'RDP Connection Information:'"
+  - powershell -Command "Write-Host 'Address: $ngrok_url'"
+  - powershell -Command "Write-Host 'Username: travis'"
+  - powershell -Command "Write-Host 'Password: Password!'"
+  - powershell -Command "Start-Sleep -Seconds 3600"  # Keep the build running for 1 hour
+
+env:
+  global:
+    - secure: "2d8Rs7cbjb6cJ4qQIkj3rI2a6yU_37kTdJDQVngseE6L5vVpH"
