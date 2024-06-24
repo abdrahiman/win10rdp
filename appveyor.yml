@@ -1,0 +1,29 @@
+image: Visual Studio 2019
+
+install:
+  - ps: |
+      Invoke-WebRequest https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-windows-amd64.zip -OutFile ngrok.zip
+      Expand-Archive ngrok.zip
+      .\ngrok\ngrok.exe authtoken $env:NGROK_AUTH_TOKEN
+
+build_script:
+  - ps: |
+      # Start RDP
+      Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+      Enable-NetFirewallRule -DisplayGroup "Remote Desktop"
+      
+      # Start ngrok
+      Start-Process .\ngrok\ngrok.exe -ArgumentList "tcp 3389"
+      
+      # Get ngrok public URL
+      Start-Sleep -Seconds 5
+      $ngrok_url = (Invoke-WebRequest -Uri http://127.0.0.1:4040/api/tunnels -UseBasicParsing).Content | ConvertFrom-Json | Select-Object -ExpandProperty tunnels | Where-Object {$_.proto -eq "tcp"} | Select-Object -ExpandProperty public_url
+      
+      # Output connection info
+      Write-Host "RDP Connection Information:"
+      Write-Host "Address: $ngrok_url"
+      Write-Host "Username: appveyor"
+      Write-Host "Password: Password!"
+
+on_finish:
+  - ps: $blockRdp = $true; iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
