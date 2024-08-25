@@ -11,7 +11,7 @@ GITHUB_API_BASE_URL = f"https://api.github.com/repos/{GITHUB_REPO}"
 GITHUB_WORKFLOW_ID = "100349647"
 NGROK_API_URL = "https://api.ngrok.com/endpoints"
 GITHUB_TOKEN ="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"
-NGROK_TOKEN = "2hBMITCvIS8fX4EPpfCDljXmoJW_7AhFvY2BnWKZSiTFAnALt"
+NGROK_TOKEN = ""
 
 def check_is_running():
     url = f"{GITHUB_API_BASE_URL}/actions/runs"
